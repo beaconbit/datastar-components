@@ -1,0 +1,59 @@
+Server starting on http://localhost:8080
+Press Ctrl+C to stop
+2026/02/23 03:13:43 GET /randomize completed in 412.406µs
+2026/02/23 03:13:43 [topaz/3EmjNmdNWs-000001] "GET http://localhost:8080/randomize?datastar=%7B%7D HTTP/1.1" from [::1]:52034 - 000 2504B in 494.363µs
+2026/02/23 03:13:43 DEBUG button attribute: data-on:click="@get('/test/randomize')"
+2026/02/23 03:13:43 GET / completed in 328.712µs
+2026/02/23 03:13:43 [topaz/3EmjNmdNWs-000002] "GET http://localhost:8080/?debug=1 HTTP/1.1" from [::1]:52048 - 200 6206B in 340.65µs
+2026/02/23 04:16:16 GET / completed in 268.698µs
+2026/02/23 04:16:16 [topaz/3EmjNmdNWs-000003] "GET http:/// HTTP/1.1" from 128.199.197.109:42546 - 200 5406B in 313.57µs
+2026/02/23 04:16:16 GET /script completed in 773.006µs
+2026/02/23 04:16:16 [topaz/3EmjNmdNWs-000004] "GET http://134.199.175.24:8080/script HTTP/1.1" from 128.199.197.109:42558 - 404 43B in 887.067µs
+2026/02/23 04:24:24 GET / completed in 331.765µs
+2026/02/23 04:24:24 [topaz/3EmjNmdNWs-000005] "GET http://134.199.175.24:8080/ HTTP/1.1" from 204.76.203.69:33500 - 200 5805B in 377.873µs
+2026/02/23 04:38:45 GET /boaform/admin/formLogin completed in 30.722µs
+2026/02/23 04:38:45 [topaz/3EmjNmdNWs-000006] "GET http:///boaform/admin/formLogin?username=ec8&psd=ec8 HTTP/1.0" from 42.53.61.212:60976 - 404 19B in 79.769µs
+2026/02/23 04:45:16 GET / completed in 2.620811ms
+2026/02/23 04:45:16 [topaz/3EmjNmdNWs-000007] "GET http://134.199.175.24:8080/ HTTP/1.1" from 20.55.4.75:36482 - 200 1732B in 2.717556ms
+2026/02/23 05:14:22 GET / completed in 937.133µs
+2026/02/23 05:14:22 [topaz/3EmjNmdNWs-000008] "GET http://134.199.175.24:8080/ HTTP/1.1" from 204.76.203.206:56540 - 200 1791B in 987.273µs
+2026/02/23 05:29:47 POST /goform/set_LimitClient_cfg completed in 579.11µs
+2026/02/23 05:29:47 [topaz/3EmjNmdNWs-000009] "POST http://134.199.175.24:8080/goform/set_LimitClient_cfg HTTP/1.1" from 193.142.146.230:38878 - 404 43B in 650.02µs
+2026/02/23 06:30:19 GET /.vscode/launch.json completed in 34.662µs
+2026/02/23 06:30:19 [topaz/3EmjNmdNWs-000010] "GET http://134.199.175.24/.vscode/launch.json HTTP/1.0" from 81.168.83.103:50015 - 404 19B in 98.884µs
+2026/02/23 07:00:46 GET /login completed in 550.536µs
+2026/02/23 07:00:46 [topaz/3EmjNmdNWs-000011] "GET http://134.199.175.24:8080/login HTTP/1.1" from 87.106.166.64:54144 - 404 43B in 679.261µs
+2026/02/23 07:24:35 GET / completed in 1.427166ms
+2026/02/23 07:24:35 [topaz/3EmjNmdNWs-000012] "GET http://134.199.175.24:8080/?XDEBUG_SESSION_START=phpstorm HTTP/1.1" from 79.124.40.174:41848 - 200 1797B in 1.494217ms
+2026/02/23 07:26:59 GET /login completed in 562.411µs
+2026/02/23 07:26:59 [topaz/3EmjNmdNWs-000013] "GET http://134.199.175.24:8080/login HTTP/1.1" from 185.242.3.231:38850 - 404 43B in 632.294µs
+2026/02/23 07:44:29 GET / completed in 370.978µs
+2026/02/23 07:44:29 [topaz/3EmjNmdNWs-000014] "GET http:/// HTTP/1.0" from 165.227.184.44:46018 - 200 5803B in 426.147µs
+2026/02/23 07:44:29 GET / completed in 1.013295ms
+2026/02/23 07:44:29 [topaz/3EmjNmdNWs-000015] "GET http://134.199.175.24:8080/ HTTP/1.1" from 165.227.184.44:46034 - 200 1842B in 1.068825ms
+2026/02/23 07:44:30 GET /favicon.ico completed in 528.029µs
+2026/02/23 07:44:30 [topaz/3EmjNmdNWs-000016] "GET http://134.199.175.24:8080/favicon.ico HTTP/1.1" from 165.227.184.44:46044 - 404 43B in 601.877µs
+2026/02/23 07:53:31 GET / completed in 1.032028ms
+2026/02/23 07:53:31 [topaz/3EmjNmdNWs-000017] "GET http://134.199.175.24:8080/ HTTP/1.1" from 204.76.203.206:60352 - 200 1791B in 1.091962ms
+2026/02/23 07:54:29 GET /login completed in 493.813µs
+2026/02/23 07:54:29 [topaz/3EmjNmdNWs-000018] "GET http://134.199.175.24:8080/login HTTP/1.1" from 87.106.166.79:50536 - 404 43B in 572.115µs
+2026/02/23 07:58:02 GET /actuator/gateway/routes completed in 48.342µs
+2026/02/23 07:58:02 [topaz/3EmjNmdNWs-000019] "GET http://134.199.175.24:8080/actuator/gateway/routes HTTP/1.1" from 79.124.40.174:48736 - 404 43B in 184.871µs
+2026/02/23 08:06:48 GET / completed in 1.05891ms
+2026/02/23 08:06:48 [topaz/3EmjNmdNWs-000020] "GET http://134.199.175.24:8080/ HTTP/1.1" from 139.59.101.215:39822 - 200 1851B in 1.129059ms
+2026/02/23 08:13:35 GET / completed in 964.227µs
+2026/02/23 08:13:35 [topaz/3EmjNmdNWs-000021] "GET http://aucklandweb.com/ HTTP/1.1" from 104.23.198.104 - 200 1786B in 1.011036ms
+2026/02/23 08:13:37 GET /randomize completed in 374.05µs
+2026/02/23 08:13:37 [topaz/3EmjNmdNWs-000022] "GET http://aucklandweb.com/randomize?datastar=%7B%7D HTTP/1.1" from 104.23.198.104 - 000 2502B in 431.159µs
+2026/02/23 08:13:38 GET /randomize completed in 254.661µs
+2026/02/23 08:13:38 [topaz/3EmjNmdNWs-000023] "GET http://aucklandweb.com/randomize?datastar=%7B%7D HTTP/1.1" from 104.23.198.104 - 000 2501B in 297.925µs
+2026/02/23 08:13:39 GET /randomize completed in 234.249µs
+2026/02/23 08:13:39 [topaz/3EmjNmdNWs-000024] "GET http://aucklandweb.com/randomize?datastar=%7B%7D HTTP/1.1" from 104.23.198.104 - 000 2899B in 334.922µs
+2026/02/23 08:13:39 GET /randomize completed in 280.424µs
+2026/02/23 08:13:39 [topaz/3EmjNmdNWs-000025] "GET http://aucklandweb.com/randomize?datastar=%7B%7D HTTP/1.1" from 104.23.198.104 - 000 2503B in 373.018µs
+2026/02/23 08:13:40 GET /randomize completed in 257.911µs
+2026/02/23 08:13:40 [topaz/3EmjNmdNWs-000026] "GET http://aucklandweb.com/randomize?datastar=%7B%7D HTTP/1.1" from 104.23.198.104 - 000 3302B in 309.195µs
+2026/02/23 08:22:50 GET /login completed in 595.805µs
+2026/02/23 08:22:50 [topaz/3EmjNmdNWs-000027] "GET http://134.199.175.24:8080/login HTTP/1.1" from 176.65.148.52:36968 - 404 43B in 684.097µs
+2026/02/23 08:42:51 GET /login completed in 583.26µs
+2026/02/23 08:42:51 [topaz/3EmjNmdNWs-000028] "GET http://134.199.175.24:8080/login HTTP/1.1" from 193.142.146.230:55142 - 404 43B in 656.508µs
