@@ -21,10 +21,10 @@ func renderComponentToString(c templ.Component) (string, error) {
 
 // Machine represents a washing machine with its delay data
 type Machine struct {
-	ID           int
-	Name         string
-	Color        string
-	TotalDelay   int // Running total delay in seconds
+	ID         int
+	Name       string
+	Color      string
+	TotalDelay int // Running total delay in seconds
 }
 
 // MinuteBar represents a single minute's stacked bar data
@@ -60,22 +60,22 @@ func DefaultStackedBarChart() StackedBarChartData {
 	// Initialize machines
 	machines := [3]Machine{
 		{
-			ID:           0,
-			Name:         "Continuous Batch Washer 1",
-			Color:        "#d8b4fe", // Light Purple
-			TotalDelay:   0,
+			ID:         0,
+			Name:       "Continuous Batch Washer 1",
+			Color:      "#d8b4fe", // Light Purple
+			TotalDelay: 0,
 		},
 		{
-			ID:           1,
-			Name:         "Continuous Batch Washer 2",
-			Color:        "#a855f7", // Medium Purple
-			TotalDelay:   0,
+			ID:         1,
+			Name:       "Continuous Batch Washer 2",
+			Color:      "#a855f7", // Medium Purple
+			TotalDelay: 0,
 		},
 		{
-			ID:           2,
-			Name:         "Continuous Batch Washer 3",
-			Color:        "#7c3aed", // Dark Purple
-			TotalDelay:   0,
+			ID:         2,
+			Name:       "Continuous Batch Washer 3",
+			Color:      "#7c3aed", // Dark Purple
+			TotalDelay: 0,
 		},
 	}
 
@@ -110,7 +110,8 @@ func DefaultStackedBarChart() StackedBarChartData {
 func (s *StackedBarChartData) GenerateClockHTML() string {
 	now := time.Now()
 	currentTime := now.Format("15:04:05")
-	component := Clock(currentTime, true)
+	clockID := s.ID + "-clock"
+	component := Clock(currentTime, true, clockID)
 	if html, err := renderComponentToString(component); err == nil {
 		return html
 	}
@@ -119,7 +120,8 @@ func (s *StackedBarChartData) GenerateClockHTML() string {
 
 // GenerateLegendHTML generates the dynamic legend with buttons and running counters
 func (s *StackedBarChartData) GenerateLegendHTML() string {
-	component := Legend(s.Machines)
+	legendID := s.ID + "-legend"
+	component := Legend(s.Machines, legendID, s.ID)
 	if html, err := renderComponentToString(component); err == nil {
 		return html
 	}
@@ -141,7 +143,8 @@ func (s *StackedBarChartData) GenerateHTML() string {
 	// Update component fields
 	now := time.Now()
 	currentTime := now.Format("15:04:05")
-	clockComponent := Clock(currentTime, true)
+	clockID := s.ID + "-clock"
+	clockComponent := Clock(currentTime, true, clockID)
 	clockHTML, err := renderComponentToString(clockComponent)
 	if err != nil {
 		clockHTML = ""

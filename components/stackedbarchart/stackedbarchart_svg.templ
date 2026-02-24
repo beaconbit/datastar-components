@@ -178,7 +178,7 @@ templ StackedBarChartSVG(data StackedBarChartData) {
             maxDelay = 60 // default
         }
     }}
-    <svg width={fmt.Sprintf("%d", svgWidth)} height={fmt.Sprintf("%d", svgHeight)} viewBox={fmt.Sprintf("0 0 %d %d", svgWidth, svgHeight)} xmlns="http://www.w3.org/2000/svg">
+    <svg width="100%" height="auto" viewBox={fmt.Sprintf("0 0 %d %d", svgWidth, svgHeight)} preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         @ChartBackground(marginLeft, marginTop, chartWidth, chartHeight)
 
         // Draw each minute bar (stacked sections)
@@ -241,9 +241,6 @@ templ StackedBarChartSVG(data StackedBarChartData) {
         // Draw axes
         @AxisLine(marginLeft, marginTop, marginLeft, marginTop+chartHeight)
         @AxisLine(marginLeft, marginTop+chartHeight, marginLeft+chartWidth, marginTop+chartHeight)
-
-        // Chart title
-        @ChartTitle(svgWidth/2, 40, data.Title)
 
         // X axis label
         @AxisLabel(svgWidth/2, svgHeight-30, data.XAxisLabel)

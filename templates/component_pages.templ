@@ -489,7 +489,7 @@ templ StackedBarChartPage(componentHTML string) {
 			body {
 				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 				margin: 0;
-				padding: 40px;
+				padding: 20px;
 				background-color: #f5f5f5;
 				display: flex;
 				flex-direction: column;
@@ -499,41 +499,17 @@ templ StackedBarChartPage(componentHTML string) {
 			.container {
 				background: white;
 				border-radius: 12px;
-				padding: 40px;
+				padding: 20px;
 				box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 				max-width: 1200px;
 				width: 100%;
+				box-sizing: border-box;
 			}
-			h1 {
-				color: #333;
-				margin-bottom: 8px;
-			}
-			.subtitle {
-				color: #666;
-				margin-bottom: 24px;
-			}
-			.controls {
-				margin-bottom: 24px;
-				display: flex;
-				gap: 12px;
-				flex-wrap: wrap;
-			}
-			button {
-				background: #8b5cf6;
-				color: white;
-				border: none;
-				padding: 12px 24px;
-				border-radius: 8px;
-				font-size: 16px;
-				font-weight: 600;
-				cursor: pointer;
-				transition: background 0.2s;
-			}
-			button:hover {
-				background: #7c3aed;
+			.chart-container {
+				width: 100%;
 			}
 			.back-link {
-				margin-top: 24px;
+				margin-top: 20px;
 				color: #a855f7;
 				text-decoration: none;
 				font-weight: 500;
@@ -541,110 +517,31 @@ templ StackedBarChartPage(componentHTML string) {
 			.back-link:hover {
 				text-decoration: underline;
 			}
-			.live-clock {
-				background: #f8f9fa;
-				border-radius: 8px;
-				padding: 16px;
-				margin-bottom: 20px;
-				text-align: center;
-				border: 2px solid #e9ecef;
+			@media (max-width: 768px) {
+				body {
+					padding: 10px;
+				}
+				.container {
+					padding: 15px;
+					border-radius: 8px;
+				}
 			}
-			.clock-label {
-				font-size: 14px;
-				color: #666;
-				margin-bottom: 8px;
-			}
-			.clock-time {
-				font-size: 24px;
-				font-weight: bold;
-				color: #333;
-				font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-			}
-			.stacked-legend {
-				background: #f8f9fa;
-				border-radius: 8px;
-				padding: 20px;
-				margin-bottom: 24px;
-				border: 1px solid #e9ecef;
-			}
-			.legend-title {
-				font-size: 16px;
-				font-weight: 600;
-				color: #333;
-				margin-bottom: 12px;
-			}
-			.legend-items {
-				display: flex;
-				flex-direction: column;
-				gap: 10px;
-			}
-			.legend-item {
-				display: flex;
-				align-items: center;
-				gap: 12px;
-			}
-			.legend-color {
-				width: 20px;
-				height: 20px;
-				border-radius: 4px;
-				flex-shrink: 0;
-			}
-			.legend-label {
-				flex-grow: 1;
-				font-size: 14px;
-				color: #333;
-			}
-			.legend-delay {
-				font-size: 14px;
-				font-weight: 600;
-				color: #333;
-				font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-				min-width: 120px;
-			}
-			.legend-button {
-				background: #a855f7;
-				color: white;
-				border: none;
-				padding: 6px 12px;
-				border-radius: 4px;
-				font-size: 14px;
-				cursor: pointer;
-				transition: background 0.2s;
-			}
-			.legend-button:hover {
-				background: #9333ea;
-			}
-			.chart-svg {
-				margin-top: 20px;
-				border-radius: 8px;
-				overflow: hidden;
-				border: 1px solid #e9ecef;
-			}
-			@keyframes pulse {
-				0% { opacity: 1; }
-				50% { opacity: 0.7; }
-				100% { opacity: 1; }
-			}
-			.current-minute {
-				animation: pulse 2s infinite;
+			@media (max-width: 480px) {
+				body {
+					padding: 5px;
+				}
+				.container {
+					padding: 10px;
+					border-radius: 6px;
+				}
 			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			<h1>Stacked Bar Chart Component</h1>
-			<p class="subtitle">Washing Machine Delay Monitor - Last 10 Minutes</p>
-			
-			<div class="controls">
-				<button data-on:click="@get('/api/stackedbarchart/randomize')">
-					Randomize Data
-				</button>
-			</div>
-			
 			<div class="chart-container">
 				@templ.Raw(componentHTML)
 			</div>
-			
 			<a href="/" class="back-link">← Back to Component Library</a>
 		</div>
 	</body>
