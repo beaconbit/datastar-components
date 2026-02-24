@@ -1,8 +1,8 @@
 package templates
 
-import "piechart-demo/components"
+import "piechart-demo/components/piechart"
 
-templ Page(pieChartData components.PieChartData) {
+templ Page(pieChartData piechart.PieChartData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -100,20 +100,20 @@ templ Page(pieChartData components.PieChartData) {
 			<p class="subtitle">Built with Go, Templ, and Datastar</p>
 			
 			<div class="controls">
-				<button data-on:click="@get('/test/randomize')">
+				<button data-on:click="@get('/api/piechart/randomize')">
 					Randomize Chart
 				</button>
 			</div>
 			
 			<div class="chart-container">
-				@components.PieChart(pieChartData)
+				@piechart.PieChart(pieChartData)
 			</div>
 			
 			<div class="explanation">
 				<h3>How it works:</h3>
 				<ul>
 					<li>The pie chart is rendered server-side using Go and Templ templates</li>
-					<li>Clicking "Randomize Chart" sends a GET request to <code>/test/randomize</code></li>
+					<li>Clicking "Randomize Chart" sends a GET request to <code>/api/piechart/randomize</code></li>
 					<li>The backend generates new random data and returns the updated chart HTML</li>
 					<li>Datastar morphs the new SVG into the DOM using Server-Sent Events</li>
 					<li>No JavaScript framework needed - just HTML over the wire!</li>

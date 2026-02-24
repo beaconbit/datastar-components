@@ -1,0 +1,53 @@
+package stackedbarchart
+
+import "fmt"
+
+templ Clock(currentTime string) {
+    <div class="live-clock" id="stacked-chart-clock">
+        <div class="clock-label">Current Time</div>
+        <div class="clock-time">{ currentTime }</div>
+    </div>
+}
+
+templ LegendItem(machineID int, color, name string, totalDelay int) {
+    <div class="legend-item" data-machine-id={ fmt.Sprintf("%d", machineID) }>
+        <span class="legend-color" style={ "background-color: " + color }></span>
+        <span class="legend-label">{ name }</span>
+        <span class="legend-delay" id={ "machine-delay-" + fmt.Sprintf("%d", machineID) }>
+            { fmt.Sprintf("%d", totalDelay) } seconds
+        </span>
+        <button 
+            class="legend-button" 
+            data-on:click={ "@get('/api/stackedbarchart/increment?machineId=" + fmt.Sprintf("%d", machineID) + "')" }
+            title="Add random delay (1-15 seconds)"
+        >
+            +
+        </button>
+    </div>
+}
+
+templ Legend(machines [3]Machine) {
+    <div class="stacked-legend" id="stacked-chart-legend">
+        <div class="legend-title">Machine Delays</div>
+        <div class="legend-items">
+            for _, machine := range machines {
+                @LegendItem(machine.ID, machine.Color, machine.Name, machine.TotalDelay)
+            }
+        </div>
+    </div>
+}
+
+templ StackedBarChartComponent(data StackedBarChartData) { 
+    {{ 
+        hour, min, sec := data.CurrentTime.Clock()
+        currentTime := fmt.Sprintf("%02d:%02d:%02d", hour, min, sec)
+    }}
+    <div id={ data.ID } class="stacked-bar-chart-container">
+        <h3>{ data.Title }</h3>
+        @Clock(currentTime)
+        @Legend(data.Machines)
+        <div class="chart-svg">
+            @StackedBarChartSVG(data)
+        </div>
+    </div>
+}
