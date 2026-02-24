@@ -70,7 +70,7 @@ func targetbarchartPageHandler(w http.ResponseWriter, r *http.Request) {
 // stackedbarchartPageHandler serves a page with just the stacked bar chart component
 func stackedbarchartPageHandler(w http.ResponseWriter, r *http.Request) {
 	stackedbarchartComp := stackedbarchart.New()
-	data := stackedbarchartComp.GenerateInitialData()
+	data := stackedbarchartComp.GenerateEmptyData()
 
 	component := templates.StackedBarChartPage(data.HTML)
 	w.Header().Set("Content-Type", "text/html")

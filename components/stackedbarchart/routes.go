@@ -3,7 +3,6 @@ package stackedbarchart
 import (
 	"encoding/json"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,47 +15,21 @@ import (
 
 // Component implements the stacked bar chart component
 type Component struct {
-	rand *rand.Rand
 	mu   sync.RWMutex
 	data StackedBarChartData
 }
 
 // New creates a new stacked bar chart component instance
 func New() *Component {
-	now := time.Now()
-	comp := &Component{
-		rand: rand.New(rand.NewSource(now.UnixNano())),
-	}
-	comp.data = comp.GenerateInitialData()
+	comp := &Component{}
+	comp.data = comp.GenerateEmptyData()
 	return comp
 }
 
-// GenerateInitialData creates initial stacked bar chart data
-func (c *Component) GenerateInitialData() StackedBarChartData {
-	log.Printf("GenerateInitialData: creating initial data")
+func (c *Component) GenerateEmptyData() StackedBarChartData {
 	data := DefaultStackedBarChart()
-
-	// Add some random delays for demonstration
-	// Add random delays to current minute for each machine
-	for i := 0; i < 3; i++ {
-		delay := c.rand.Intn(30) + 1
-		data.AddRandomDelay(i)
-		// Set a specific delay for demo
-		data.Machines[i].TotalDelay = delay * 2
-	}
-
-	// Add some historical delays
-	for i := 0; i < len(data.Minutes)-1; i++ {
-		for j := 0; j < 3; j++ {
-			delay := c.rand.Intn(20)
-			data.Minutes[i].MachineDelays[j] = delay
-			data.Minutes[i].TotalDelay += delay
-		}
-	}
-
 	data.SVG = data.GenerateSVGString()
 	data.HTML = data.GenerateHTML()
-	log.Printf("GenerateInitialData: data generated with %d minutes", len(data.Minutes))
 	return data
 }
 
@@ -287,54 +260,6 @@ func (c *Component) clockTickHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// randomizeHandler handles requests to randomize all data
-func (c *Component) randomizeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("randomizeHandler: request received: %s %s", r.Method, r.URL.String())
-	// Check if this is a Datastar request
-	if r.URL.Query().Get("datastar") != "" {
-		log.Printf("randomizeHandler: datastar request detected")
-		// Read signals from request (ignore errors)
-		var signals map[string]interface{}
-		datastar.ReadSignals(r, &signals) // Ignore error for GET requests
-
-		// Generate new random data
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		log.Printf("randomizeHandler: generating new random data")
-		c.data = c.GenerateInitialData()
-
-		// Create the stacked bar chart component
-		chartComponent := StackedBarChart(c.data, true)
-
-		// Create SSE response
-		sse := datastar.NewSSE(w, r)
-
-		// Render component to string
-		var buf strings.Builder
-		if err := chartComponent.Render(r.Context(), &buf); err != nil {
-			log.Printf("randomizeHandler: error rendering component: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		html := buf.String()
-		log.Printf("randomizeHandler: patching DOM with HTML length %d", len(html))
-		// Patch the chart into the DOM
-		sse.PatchElements(html)
-
-		return
-	}
-
-	log.Printf("randomizeHandler: non-datastar request, returning plain HTML")
-	// Fallback: return just the chart HTML for non-Datastar requests
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.data = c.GenerateInitialData()
-	chartComponent := StackedBarChart(c.data, true)
-
-	w.Header().Set("Content-Type", "text/html")
-	chartComponent.Render(r.Context(), w)
-}
 
 // signalsHandler handles requests for stacked bar chart signals
 func (c *Component) signalsHandler(w http.ResponseWriter, r *http.Request) {
@@ -359,7 +284,6 @@ func (c *Component) RegisterRoutes(r chi.Router) {
 	r.Get("/increment", c.incrementHandler)
 	r.Get("/advance", c.advanceMinuteHandler)
 	r.Get("/tick", c.clockTickHandler)
-	r.Get("/randomize", c.randomizeHandler)
 	r.Get("/signals", c.signalsHandler)
 }
 

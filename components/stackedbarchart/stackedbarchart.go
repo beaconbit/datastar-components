@@ -3,7 +3,6 @@ package stackedbarchart
 import (
 	"context"
 	"log"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -170,7 +169,7 @@ func (s *StackedBarChartData) AddRandomDelay(machineID int) {
 	}
 
 	// Add random delay between 1 and 15 seconds
-	randomDelay := rand.Intn(15) + 1
+	randomDelay :=  1
 
 	// Update current minute (last in array)
 	currentMinute := &s.Minutes[len(s.Minutes)-1]
