@@ -12,7 +12,8 @@ templ Clock(currentTime string, autoStart bool) {
     <div 
         class="live-clock" 
         id="stacked-chart-clock"
-        data-on:load={ loadAttr }
+        data-on:click={ loadAttr }
+        title="Click to start live updates"
     >
         <div class="clock-label">Current Time</div>
         <div class="clock-time">{ currentTime }</div>

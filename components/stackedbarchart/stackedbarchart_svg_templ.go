@@ -840,7 +840,7 @@ func PulseAnimationStyle() templ.Component {
 			templ_7745c5c3_Var51 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<style>\n        @keyframes pulse {\n            0% { opacity: 1; }\n            50% { opacity: 0.7; }\n            100% { opacity: 1; }\n        }\n        .current-minute {\n            animation: pulse 2s infinite;\n        }\n    </style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<style>\n        @keyframes pulse {\n            0% { opacity: 1; }\n            40% { opacity: 0.2; }\n            80% { opacity: 1; }\n            100% { opacity: 1; }\n        }\n        .current-minute {\n            animation: pulse 4s infinite;\n        }\n    </style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -905,7 +905,7 @@ func StackedBarChartSVG(data StackedBarChartData) templ.Component {
 		var templ_7745c5c3_Var53 string
 		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", svgWidth))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/stackedbarchart_svg.templ`, Line: 180, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/stackedbarchart_svg.templ`, Line: 181, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 		if templ_7745c5c3_Err != nil {
@@ -918,7 +918,7 @@ func StackedBarChartSVG(data StackedBarChartData) templ.Component {
 		var templ_7745c5c3_Var54 string
 		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", svgHeight))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/stackedbarchart_svg.templ`, Line: 180, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/stackedbarchart_svg.templ`, Line: 181, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 		if templ_7745c5c3_Err != nil {
@@ -931,7 +931,7 @@ func StackedBarChartSVG(data StackedBarChartData) templ.Component {
 		var templ_7745c5c3_Var55 string
 		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("0 0 %d %d", svgWidth, svgHeight))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/stackedbarchart_svg.templ`, Line: 180, Col: 137}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/stackedbarchart_svg.templ`, Line: 181, Col: 137}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 		if templ_7745c5c3_Err != nil {

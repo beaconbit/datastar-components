@@ -2,6 +2,7 @@ package stackedbarchart
 
 import (
 	"context"
+	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -23,7 +24,6 @@ type Machine struct {
 	ID           int
 	Name         string
 	Color        string
-	CurrentDelay int // Delay for current minute in seconds
 	TotalDelay   int // Running total delay in seconds
 }
 
@@ -63,21 +63,18 @@ func DefaultStackedBarChart() StackedBarChartData {
 			ID:           0,
 			Name:         "Continuous Batch Washer 1",
 			Color:        "#d8b4fe", // Light Purple
-			CurrentDelay: 0,
 			TotalDelay:   0,
 		},
 		{
 			ID:           1,
 			Name:         "Continuous Batch Washer 2",
 			Color:        "#a855f7", // Medium Purple
-			CurrentDelay: 0,
 			TotalDelay:   0,
 		},
 		{
 			ID:           2,
 			Name:         "Continuous Batch Washer 3",
 			Color:        "#7c3aed", // Dark Purple
-			CurrentDelay: 0,
 			TotalDelay:   0,
 		},
 	}
@@ -113,7 +110,7 @@ func DefaultStackedBarChart() StackedBarChartData {
 func (s *StackedBarChartData) GenerateClockHTML() string {
 	now := time.Now()
 	currentTime := now.Format("15:04:05")
-	component := Clock(currentTime, false)
+	component := Clock(currentTime, true)
 	if html, err := renderComponentToString(component); err == nil {
 		return html
 	}
@@ -140,6 +137,7 @@ func (s *StackedBarChartData) GenerateSVGString() string {
 
 // GenerateHTML generates the full HTML for the stacked bar chart component
 func (s *StackedBarChartData) GenerateHTML() string {
+	log.Printf("GenerateHTML called, rendering with autoStart=true")
 	// Update component fields
 	now := time.Now()
 	currentTime := now.Format("15:04:05")
@@ -155,8 +153,10 @@ func (s *StackedBarChartData) GenerateHTML() string {
 	// Render full component using templ
 	component := StackedBarChartComponent(*s, true)
 	if html, err := renderComponentToString(component); err == nil {
+		log.Printf("GenerateHTML: rendered successfully, length=%d", len(html))
 		return html
 	}
+	log.Printf("GenerateHTML: rendering failed")
 	return ""
 }
 
@@ -175,19 +175,32 @@ func (s *StackedBarChartData) AddRandomDelay(machineID int) {
 	currentMinute.TotalDelay += randomDelay
 
 	// Update machine totals
-	s.Machines[machineID].CurrentDelay += randomDelay
 	s.Machines[machineID].TotalDelay += randomDelay
 }
 
 // AdvanceMinute shifts the chart by one minute, dropping oldest, adding new current minute
 func (s *StackedBarChartData) AdvanceMinute() {
-	// Drop oldest minute (index 0) and shift remaining left
-	// Create new slice with elements 1..9 (9 elements)
-	// Update minute offsets for all bars (now indices 0..9 correspond to -9..0)
-	for idx := range s.Minutes {
-		s.Minutes[idx].MinuteOffset = idx - 1 // -9 to 0
+	log.Printf("AdvanceMinute: START - CurrentTime: %s, Minutes length: %d", s.CurrentTime.Format("15:04:05"), len(s.Minutes))
+
+	// Log current minute offsets and totals
+	for i, minute := range s.Minutes {
+		log.Printf("AdvanceMinute: BEFORE minute[%d] - offset: %d, timestamp: %s, totalDelay: %d, machineDelays: %v",
+			i, minute.MinuteOffset, minute.Timestamp.Format("15:04:05"), minute.TotalDelay, minute.MachineDelays)
 	}
-	newMinutes := s.Minutes[1:]
+
+	// Log machine current delays
+	for i, machine := range s.Machines {
+		log.Printf("AdvanceMinute: BEFORE machine[%d] - ID: %d, TotalDelay: %d",
+			i, machine.ID, machine.TotalDelay)
+	}
+
+	// Drop oldest minute (index 0) and shift remaining left
+	// Shift slice left by one (move elements 1..9 to 0..8)
+	for i := 0; i < 9; i++ {
+		s.Minutes[i] = s.Minutes[i+1]
+		// Update offset: each minute becomes one minute older relative to new current time
+		s.Minutes[i].MinuteOffset -= 1
+	}
 
 	// Create new current minute with zero delays
 	now := time.Now()
@@ -198,15 +211,29 @@ func (s *StackedBarChartData) AdvanceMinute() {
 		TotalDelay:    0,
 	}
 
-	// Append new current minute
-	s.Minutes = append(newMinutes, newCurrentMinute)
+	// Replace last element with new current minute
+	s.Minutes[9] = newCurrentMinute
 
 	// Update current time
 	s.CurrentTime = now
 
-	// Reset machine CurrentDelay fields for new minute
+	// Reset machine TotalDelay fields for new minute
 	for i := range s.Machines {
-		s.Machines[i].CurrentDelay = 0
+		s.Machines[i].TotalDelay = 0
 	}
 
+	// Log after state
+	log.Printf("AdvanceMinute: AFTER - CurrentTime: %s, Minutes length: %d", s.CurrentTime.Format("15:04:05"), len(s.Minutes))
+	for i, minute := range s.Minutes {
+		log.Printf("AdvanceMinute: AFTER minute[%d] - offset: %d, timestamp: %s, totalDelay: %d, machineDelays: %v",
+			i, minute.MinuteOffset, minute.Timestamp.Format("15:04:05"), minute.TotalDelay, minute.MachineDelays)
+	}
+
+	// Log machine current delays after reset
+	for i, machine := range s.Machines {
+		log.Printf("AdvanceMinute: AFTER machine[%d] - ID: %d, TotalDelay: %d",
+			i, machine.ID, machine.TotalDelay)
+	}
+
+	log.Printf("AdvanceMinute: COMPLETE")
 }
