@@ -24,12 +24,12 @@ templ LegendItem(machineID int, color, name string, totalDelay int, componentID 
         <span class="legend-color" style={ "background-color: " + color }></span>
         <span class="legend-label">{ name }</span>
         <span class="legend-delay" id={ componentID + "-machine-delay-" + fmt.Sprintf("%d", machineID) }>
-            { fmt.Sprintf("%d", totalDelay) } seconds
+            { fmt.Sprintf("%d", totalDelay/60) } minutes
         </span>
         <button 
             class="legend-button" 
-            data-on:click={ "@get('/api/stackedbarchart/increment?machineId=" + fmt.Sprintf("%d", machineID) + "')" }
-            title="Add random delay (1-15 seconds)"
+            data-on:click={ "@get('/api/stackedbarchart/minuteincrement?machineId=" + fmt.Sprintf("%d", machineID) + "')" }
+            title="Add 1 minute delay"
         >
             +
         </button>

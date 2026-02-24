@@ -20,7 +20,7 @@ templ BarSection(x, y, width, height int, color, machineName string, delay int, 
         stroke="#fff" 
         stroke-width="1"
     >
-        <title>{ machineName }: { fmt.Sprintf("%d", delay) } seconds</title>
+        <title>{ machineName }: { fmt.Sprintf("%d", delay/60) } minutes</title>
     </rect>
 }
 
@@ -159,7 +159,7 @@ templ StackedBarChartSVG(data StackedBarChartData) {
         chartHeight := svgHeight - marginTop - marginBottom
 
         // Calculate bar spacing
-        numBars := len(data.Minutes)
+        numBars := len(data.Hours)
         barSpacing := 10
         availableWidth := chartWidth - (barSpacing * (numBars - 1))
         barWidth := availableWidth / numBars
@@ -169,9 +169,9 @@ templ StackedBarChartSVG(data StackedBarChartData) {
 
         // Find max delay for scaling
         maxDelay := 0
-        for _, minute := range data.Minutes {
-            if minute.TotalDelay > maxDelay {
-                maxDelay = minute.TotalDelay
+        for _, hour := range data.Hours {
+            if hour.TotalDelay > maxDelay {
+                maxDelay = hour.TotalDelay
             }
         }
         if maxDelay == 0 {
@@ -181,13 +181,13 @@ templ StackedBarChartSVG(data StackedBarChartData) {
     <svg width="100%" height="auto" viewBox={fmt.Sprintf("0 0 %d %d", svgWidth, svgHeight)} preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         @ChartBackground(marginLeft, marginTop, chartWidth, chartHeight)
 
-        // Draw each minute bar (stacked sections)
-        for i, minute := range data.Minutes {
+        // Draw each hour bar (stacked sections)
+        for i, hour := range data.Hours {
             // Calculate bar position
             {{ x := marginLeft + (i * (barWidth + barSpacing)) }}
             {{ yBase := marginTop + chartHeight }}
             {{ accumulatedHeight := 0 }}
-            for machineIdx, delay := range minute.MachineDelays {
+            for machineIdx, delay := range hour.MachineDelays {
                 if delay == 0 {
                     continue
                 }
@@ -199,21 +199,21 @@ templ StackedBarChartSVG(data StackedBarChartData) {
                     y := yBase - accumulatedHeight - sectionHeight
                     color := data.Machines[machineIdx].Color
                     machineName := data.Machines[machineIdx].Name
-                    isCurrentMinute := i == numBars-1
+                    isCurrentHour := i == numBars-1
                 }}
-                @BarSection(x, y, barWidth, sectionHeight, color, machineName, delay, isCurrentMinute)
+                @BarSection(x, y, barWidth, sectionHeight, color, machineName, delay, isCurrentHour)
                 {{ accumulatedHeight += sectionHeight }}
             }
 
-            // Draw bar label (minutes ago)
+            // Draw bar label (hours ago)
             {{ 
                 labelText := ""
-                if minute.MinuteOffset == 0 {
+                if hour.HourOffset == 0 {
                     labelText = "Now"
-                } else if minute.MinuteOffset == -1 {
-                    labelText = "1 min"
+                } else if hour.HourOffset == -1 {
+                    labelText = "1 hr"
                 } else {
-                    labelText = fmt.Sprintf("%d min", -minute.MinuteOffset)
+                    labelText = fmt.Sprintf("%d hr", -hour.HourOffset)
                 }
                 labelX := x + barWidth/2
                 labelY := yBase + 20
@@ -221,9 +221,9 @@ templ StackedBarChartSVG(data StackedBarChartData) {
             @BarLabel(labelX, labelY, labelText)
 
             // Draw total delay on top of bar if there's space
-            if minute.TotalDelay > 0 && accumulatedHeight > 20 {
+            if hour.TotalDelay > 0 && accumulatedHeight > 20 {
                 {{ valueY := yBase - accumulatedHeight - 5 }}
-                @BarValue(labelX, valueY, minute.TotalDelay)
+                @BarValue(labelX, valueY, hour.TotalDelay/60)
             }
         }
 
@@ -231,7 +231,7 @@ templ StackedBarChartSVG(data StackedBarChartData) {
         {{ numYTicks := 6 }}
         for i := 0; i <= numYTicks; i++ {
             {{ 
-                value := (float64(i) / float64(numYTicks)) * float64(maxDelay)
+                value := (float64(i) / float64(numYTicks)) * float64(maxDelay) / 60.0
                 y := marginTop + chartHeight - int((float64(i)/float64(numYTicks))*float64(chartHeight))
             }}
             @TickLine(marginLeft-5, y, marginLeft, y)

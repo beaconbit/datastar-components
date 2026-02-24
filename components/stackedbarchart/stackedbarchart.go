@@ -26,12 +26,12 @@ type Machine struct {
 	TotalDelay int // Running total delay in seconds
 }
 
-// MinuteBar represents a single minute's stacked bar data
-type MinuteBar struct {
-	MinuteOffset  int // 0 = current minute, -1 = 1 min ago, ..., -9 = 9 min ago
+// HourBar represents a single hour's stacked bar data
+type HourBar struct {
+	HourOffset    int // 0 = current hour, -1 = 1 hr ago, ..., -9 = 9 hr ago
 	Timestamp     time.Time
 	MachineDelays [3]int // Delays for each machine in seconds
-	TotalDelay    int    // Sum of all machine delays for this minute
+	TotalDelay    int    // Sum of all machine delays for this hour
 }
 
 // StackedBarChartData represents the stacked bar chart component's data
@@ -40,7 +40,7 @@ type StackedBarChartData struct {
 	Title       string
 	XAxisLabel  string
 	YAxisLabel  string
-	Minutes     []MinuteBar // 10 minutes, index 0 is oldest (-9), index 9 is current (0)
+	Hours       []HourBar // 10 hours, index 0 is oldest (-9), index 9 is current (0)
 	Machines    [3]Machine
 	CurrentTime time.Time
 	Width       int
@@ -78,13 +78,13 @@ func DefaultStackedBarChart() StackedBarChartData {
 		},
 	}
 
-	// Initialize 10 minutes of data (9 minutes ago to current minute)
-	minutes := make([]MinuteBar, 10)
+	// Initialize 10 hours of data (9 hours ago to current hour)
+	hours := make([]HourBar, 10)
 	for i := 0; i < 10; i++ {
 		offset := i - 9 // -9 (oldest) to 0 (current)
-		timestamp := now.Add(time.Duration(offset) * time.Minute)
-		minutes[i] = MinuteBar{
-			MinuteOffset:  offset,
+		timestamp := now.Add(time.Duration(offset) * time.Hour)
+		hours[i] = HourBar{
+			HourOffset:    offset,
 			Timestamp:     timestamp,
 			MachineDelays: [3]int{0, 0, 0},
 			TotalDelay:    0,
@@ -94,9 +94,9 @@ func DefaultStackedBarChart() StackedBarChartData {
 	return StackedBarChartData{
 		ID:          "stacked-bar-chart",
 		Title:       "Washing Machine Delay Monitor",
-		XAxisLabel:  "Minutes Ago",
-		YAxisLabel:  "Delay (seconds)",
-		Minutes:     minutes,
+		XAxisLabel:  "Hours Ago",
+		YAxisLabel:  "Delay (minutes)",
+		Hours:       hours,
 		Machines:    machines,
 		CurrentTime: now,
 		Width:       1000,
@@ -162,80 +162,80 @@ func (s *StackedBarChartData) GenerateHTML() string {
 	return ""
 }
 
-// AddRandomDelay adds a random delay (1-15 seconds) to a machine's current minute
-func (s *StackedBarChartData) AddRandomDelay(machineID int) {
+// AddMinuteDelay adds a 1 minute delay (60 seconds) to a machine's current hour
+func (s *StackedBarChartData) AddMinuteDelay(machineID int) {
 	if machineID < 0 || machineID >= len(s.Machines) {
 		return
 	}
 
-	// Add random delay between 1 and 15 seconds
-	randomDelay :=  1
+	// Add 1 minute delay (60 seconds)
+	delay := 60
 
-	// Update current minute (last in array)
-	currentMinute := &s.Minutes[len(s.Minutes)-1]
-	currentMinute.MachineDelays[machineID] += randomDelay
-	currentMinute.TotalDelay += randomDelay
+	// Update current hour (last in array)
+	currentHour := &s.Hours[len(s.Hours)-1]
+	currentHour.MachineDelays[machineID] += delay
+	currentHour.TotalDelay += delay
 
 	// Update machine totals
-	s.Machines[machineID].TotalDelay += randomDelay
+	s.Machines[machineID].TotalDelay += delay
 }
 
-// AdvanceMinute shifts the chart by one minute, dropping oldest, adding new current minute
-func (s *StackedBarChartData) AdvanceMinute() {
-	log.Printf("AdvanceMinute: START - CurrentTime: %s, Minutes length: %d", s.CurrentTime.Format("15:04:05"), len(s.Minutes))
+// AdvanceHour shifts the chart by one hour, dropping oldest, adding new current hour
+func (s *StackedBarChartData) AdvanceHour() {
+	log.Printf("AdvanceHour: START - CurrentTime: %s, Hours length: %d", s.CurrentTime.Format("15:04:05"), len(s.Hours))
 
-	// Log current minute offsets and totals
-	for i, minute := range s.Minutes {
-		log.Printf("AdvanceMinute: BEFORE minute[%d] - offset: %d, timestamp: %s, totalDelay: %d, machineDelays: %v",
-			i, minute.MinuteOffset, minute.Timestamp.Format("15:04:05"), minute.TotalDelay, minute.MachineDelays)
+	// Log current hour offsets and totals
+	for i, hour := range s.Hours {
+		log.Printf("AdvanceHour: BEFORE hour[%d] - offset: %d, timestamp: %s, totalDelay: %d, machineDelays: %v",
+			i, hour.HourOffset, hour.Timestamp.Format("15:04:05"), hour.TotalDelay, hour.MachineDelays)
 	}
 
 	// Log machine current delays
 	for i, machine := range s.Machines {
-		log.Printf("AdvanceMinute: BEFORE machine[%d] - ID: %d, TotalDelay: %d",
+		log.Printf("AdvanceHour: BEFORE machine[%d] - ID: %d, TotalDelay: %d",
 			i, machine.ID, machine.TotalDelay)
 	}
 
-	// Drop oldest minute (index 0) and shift remaining left
+	// Drop oldest hour (index 0) and shift remaining left
 	// Shift slice left by one (move elements 1..9 to 0..8)
 	for i := 0; i < 9; i++ {
-		s.Minutes[i] = s.Minutes[i+1]
-		// Update offset: each minute becomes one minute older relative to new current time
-		s.Minutes[i].MinuteOffset -= 1
+		s.Hours[i] = s.Hours[i+1]
+		// Update offset: each hour becomes one hour older relative to new current time
+		s.Hours[i].HourOffset -= 1
 	}
 
-	// Create new current minute with zero delays
+	// Create new current hour with zero delays
 	now := time.Now()
-	newCurrentMinute := MinuteBar{
-		MinuteOffset:  0,
+	newCurrentHour := HourBar{
+		HourOffset:    0,
 		Timestamp:     now,
 		MachineDelays: [3]int{0, 0, 0},
 		TotalDelay:    0,
 	}
 
-	// Replace last element with new current minute
-	s.Minutes[9] = newCurrentMinute
+	// Replace last element with new current hour
+	s.Hours[9] = newCurrentHour
 
 	// Update current time
 	s.CurrentTime = now
 
-	// Reset machine TotalDelay fields for new minute
+	// Reset machine TotalDelay fields for new hour
 	for i := range s.Machines {
 		s.Machines[i].TotalDelay = 0
 	}
 
 	// Log after state
-	log.Printf("AdvanceMinute: AFTER - CurrentTime: %s, Minutes length: %d", s.CurrentTime.Format("15:04:05"), len(s.Minutes))
-	for i, minute := range s.Minutes {
-		log.Printf("AdvanceMinute: AFTER minute[%d] - offset: %d, timestamp: %s, totalDelay: %d, machineDelays: %v",
-			i, minute.MinuteOffset, minute.Timestamp.Format("15:04:05"), minute.TotalDelay, minute.MachineDelays)
+	log.Printf("AdvanceHour: AFTER - CurrentTime: %s, Hours length: %d", s.CurrentTime.Format("15:04:05"), len(s.Hours))
+	for i, hour := range s.Hours {
+		log.Printf("AdvanceHour: AFTER hour[%d] - offset: %d, timestamp: %s, totalDelay: %d, machineDelays: %v",
+			i, hour.HourOffset, hour.Timestamp.Format("15:04:05"), hour.TotalDelay, hour.MachineDelays)
 	}
 
 	// Log machine current delays after reset
 	for i, machine := range s.Machines {
-		log.Printf("AdvanceMinute: AFTER machine[%d] - ID: %d, TotalDelay: %d",
+		log.Printf("AdvanceHour: AFTER machine[%d] - ID: %d, TotalDelay: %d",
 			i, machine.ID, machine.TotalDelay)
 	}
 
-	log.Printf("AdvanceMinute: COMPLETE")
+	log.Printf("AdvanceHour: COMPLETE")
 }

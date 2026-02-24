@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-func TestClockTickHandler_MinuteChange(t *testing.T) {
-	// Create component with chart's current time set to a minute ago
+func TestClockTickHandler_HourChange(t *testing.T) {
+	// Create component with chart's current time set to a hour ago
 	comp := New()
-	comp.data.CurrentTime = time.Now().Add(-time.Minute) // simulate that chart is behind wall time by a minute
+	comp.data.CurrentTime = time.Now().Add(-time.Hour) // simulate that chart is behind wall time by a hour
 
 	// Create request to tick endpoint with datastar param
 	req := httptest.NewRequest("GET", "/tick?datastar=true", nil)
@@ -37,7 +37,7 @@ func TestClockTickHandler_MinuteChange(t *testing.T) {
 	}
 }
 
-func TestClockTickHandler_NoMinuteChange(t *testing.T) {
+func TestClockTickHandler_NoHourChange(t *testing.T) {
 	// Create component with chart's current time set to current wall time
 	comp := New()
 	comp.data.CurrentTime = time.Now()
@@ -57,41 +57,41 @@ func TestClockTickHandler_NoMinuteChange(t *testing.T) {
 	}
 }
 
-func TestAdvanceMinute(t *testing.T) {
+func TestAdvanceHour(t *testing.T) {
 	data := DefaultStackedBarChart()
-	// Store original minutes
-	originalMinutes := make([]MinuteBar, len(data.Minutes))
-	copy(originalMinutes, data.Minutes)
+	// Store original hours
+	originalHours := make([]HourBar, len(data.Hours))
+	copy(originalHours, data.Hours)
 
-	data.AdvanceMinute()
+	data.AdvanceHour()
 
 	// Check length unchanged
-	if len(data.Minutes) != 10 {
-		t.Errorf("expected 10 minutes, got %d", len(data.Minutes))
+	if len(data.Hours) != 10 {
+		t.Errorf("expected 10 hours, got %d", len(data.Hours))
 	}
 
-	// Check that minutes shifted: index 0 should be original index 1 (compare timestamps)
+	// Check that hours shifted: index 0 should be original index 1 (compare timestamps)
 	for i := 0; i < 9; i++ {
-		if !data.Minutes[i].Timestamp.Equal(originalMinutes[i+1].Timestamp) {
-			t.Errorf("minute timestamp mismatch at index %d", i)
+		if !data.Hours[i].Timestamp.Equal(originalHours[i+1].Timestamp) {
+			t.Errorf("hour timestamp mismatch at index %d", i)
 		}
 	}
-	// Check new current minute offset is 0
-	if data.Minutes[9].MinuteOffset != 0 {
-		t.Errorf("new current minute offset should be 0, got %d", data.Minutes[9].MinuteOffset)
+	// Check new current hour offset is 0
+	if data.Hours[9].HourOffset != 0 {
+		t.Errorf("new current hour offset should be 0, got %d", data.Hours[9].HourOffset)
 	}
-	// Check that new current minute has zero delays
+	// Check that new current hour has zero delays
 	for i := 0; i < 3; i++ {
-		if data.Minutes[9].MachineDelays[i] != 0 {
-			t.Errorf("new current minute should have zero delays for machine %d", i)
+		if data.Hours[9].MachineDelays[i] != 0 {
+			t.Errorf("new current hour should have zero delays for machine %d", i)
 		}
 	}
-	// Check that oldest minute (original index 0) is no longer present
-	// by verifying its timestamp is not in data.Minutes
-	oldestTimestamp := originalMinutes[0].Timestamp
-	for i, minute := range data.Minutes {
-		if minute.Timestamp.Equal(oldestTimestamp) {
-			t.Errorf("oldest minute still present at index %d", i)
+	// Check that oldest hour (original index 0) is no longer present
+	// by verifying its timestamp is not in data.Hours
+	oldestTimestamp := originalHours[0].Timestamp
+	for i, hour := range data.Hours {
+		if hour.Timestamp.Equal(oldestTimestamp) {
+			t.Errorf("oldest hour still present at index %d", i)
 		}
 	}
 }
