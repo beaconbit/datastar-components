@@ -12,8 +12,7 @@ templ Clock(currentTime string, autoStart bool, clockID string) {
     <div 
         class="live-clock" 
         id={ clockID }
-        data-on:click={ loadAttr }
-        title="Click to start live updates"
+        data-init={ loadAttr }
     >
         <div class="clock-label">Current Time</div>
         <div class="clock-time">{ currentTime }</div>

@@ -42,33 +42,33 @@ func Clock(currentTime string, autoStart bool, clockID string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(clockID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 14, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 14, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-on:click=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-init=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(loadAttr)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 15, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 15, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" title=\"Click to start live updates\"><div class=\"clock-label\">Current Time</div><div class=\"clock-time\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"clock-label\">Current Time</div><div class=\"clock-time\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(currentTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 19, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 18, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -110,7 +110,7 @@ func LegendItem(machineID int, color, name string, totalDelay int, componentID s
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", machineID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 24, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 23, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -123,7 +123,7 @@ func LegendItem(machineID int, color, name string, totalDelay int, componentID s
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + color)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 25, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 24, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -136,7 +136,7 @@ func LegendItem(machineID int, color, name string, totalDelay int, componentID s
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 26, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 25, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -149,7 +149,7 @@ func LegendItem(machineID int, color, name string, totalDelay int, componentID s
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(componentID + "-machine-delay-" + fmt.Sprintf("%d", machineID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 27, Col: 102}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 26, Col: 102}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -162,7 +162,7 @@ func LegendItem(machineID int, color, name string, totalDelay int, componentID s
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", totalDelay))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 28, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 27, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -175,7 +175,7 @@ func LegendItem(machineID int, color, name string, totalDelay int, componentID s
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("@get('/api/stackedbarchart/increment?machineId=" + fmt.Sprintf("%d", machineID) + "')")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 32, Col: 115}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 31, Col: 115}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -217,7 +217,7 @@ func Legend(machines [3]Machine, legendID string, componentID string) templ.Comp
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(legendID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 41, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 40, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -271,7 +271,7 @@ func StackedBarChartComponent(data StackedBarChartData, autoStart bool) templ.Co
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(data.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/stackedbarchart/clock_legend.templ`, Line: 56, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `clock_legend.templ`, Line: 55, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
