@@ -2,7 +2,6 @@ package stackedbarchart
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -114,7 +113,7 @@ func DefaultStackedBarChart() StackedBarChartData {
 func (s *StackedBarChartData) GenerateClockHTML() string {
 	now := time.Now()
 	currentTime := now.Format("15:04:05")
-	component := Clock(currentTime)
+	component := Clock(currentTime, false)
 	if html, err := renderComponentToString(component); err == nil {
 		return html
 	}
@@ -141,27 +140,24 @@ func (s *StackedBarChartData) GenerateSVGString() string {
 
 // GenerateHTML generates the full HTML for the stacked bar chart component
 func (s *StackedBarChartData) GenerateHTML() string {
-	var sb strings.Builder
-
-	sb.WriteString(fmt.Sprintf(`<div id="%s" class="stacked-bar-chart-container">`, s.ID))
-	sb.WriteString(fmt.Sprintf(`<h3>%s</h3>`, s.Title))
-
-	// Live clock
-	s.ClockHTML = s.GenerateClockHTML()
-	sb.WriteString(s.ClockHTML)
-
-	// Legend with buttons
+	// Update component fields
+	now := time.Now()
+	currentTime := now.Format("15:04:05")
+	clockComponent := Clock(currentTime, true)
+	clockHTML, err := renderComponentToString(clockComponent)
+	if err != nil {
+		clockHTML = ""
+	}
+	s.ClockHTML = clockHTML
 	s.LegendHTML = s.GenerateLegendHTML()
-	sb.WriteString(s.LegendHTML)
-
-	// Chart SVG
 	s.SVG = s.GenerateSVGString()
-	sb.WriteString(`<div class="chart-svg">`)
-	sb.WriteString(s.SVG)
-	sb.WriteString(`</div>`)
 
-	sb.WriteString(`</div>`)
-	return sb.String()
+	// Render full component using templ
+	component := StackedBarChartComponent(*s, true)
+	if html, err := renderComponentToString(component); err == nil {
+		return html
+	}
+	return ""
 }
 
 // AddRandomDelay adds a random delay (1-15 seconds) to a machine's current minute
@@ -207,7 +203,6 @@ func (s *StackedBarChartData) AdvanceMinute() {
 
 	// Update current time
 	s.CurrentTime = now
-
 
 	// Reset machine CurrentDelay fields for new minute
 	for i := range s.Machines {

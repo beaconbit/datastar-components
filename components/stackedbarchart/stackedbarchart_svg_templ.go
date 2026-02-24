@@ -896,7 +896,7 @@ func StackedBarChartSVG(data StackedBarChartData) templ.Component {
 			}
 		}
 		if maxDelay == 0 {
-			maxDelay = 180 // default
+			maxDelay = 60 // default
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<svg width=\"")
 		if templ_7745c5c3_Err != nil {

@@ -1,8 +1,10 @@
 package button
 
 import (
-	"fmt"
+	"context"
 	"strings"
+
+	"github.com/a-h/templ"
 )
 
 // ButtonData represents a button component's data
@@ -14,6 +16,15 @@ type ButtonData struct {
 	Disabled   bool
 	Loading    bool
 	ClickCount int
+}
+
+func renderComponentToString(c templ.Component) (string, error) {
+	var buf strings.Builder
+	ctx := context.Background()
+	if err := c.Render(ctx, &buf); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 // DefaultButton creates a button with default values
@@ -31,33 +42,11 @@ func DefaultButton() ButtonData {
 
 // GenerateHTML generates the HTML for a button
 func (b ButtonData) GenerateHTML() string {
-	var classes []string
-	classes = append(classes, "btn")
-	classes = append(classes, "btn-"+b.Variant)
-	classes = append(classes, "btn-"+b.Size)
-
-	if b.Disabled {
-		classes = append(classes, "disabled")
+	component := ButtonComponent(b)
+	if html, err := renderComponentToString(component); err == nil {
+		return html
 	}
-	if b.Loading {
-		classes = append(classes, "loading")
-	}
-
-	classStr := strings.Join(classes, " ")
-
-	disabledAttr := ""
-	if b.Disabled {
-		disabledAttr = "disabled"
-	}
-
-	loadingText := ""
-	if b.Loading {
-		loadingText = `<span class="spinner"></span>`
-	}
-
-	return fmt.Sprintf(`<button id="%s" class="%s" %s data-click-count="%d">
-		%s%s
-	</button>`, b.ID, classStr, disabledAttr, b.ClickCount, loadingText, b.Label)
+	return ""
 }
 
 // WithLabel creates a copy with new label

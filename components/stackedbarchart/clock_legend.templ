@@ -2,8 +2,18 @@ package stackedbarchart
 
 import "fmt"
 
-templ Clock(currentTime string) {
-    <div class="live-clock" id="stacked-chart-clock">
+templ Clock(currentTime string, autoStart bool) {
+    {{
+        loadAttr := ""
+        if autoStart {
+            loadAttr = `@get('/api/stackedbarchart/tick')`
+        }
+    }}
+    <div 
+        class="live-clock" 
+        id="stacked-chart-clock"
+        data-on:load={ loadAttr }
+    >
         <div class="clock-label">Current Time</div>
         <div class="clock-time">{ currentTime }</div>
     </div>
@@ -37,14 +47,14 @@ templ Legend(machines [3]Machine) {
     </div>
 }
 
-templ StackedBarChartComponent(data StackedBarChartData) { 
+templ StackedBarChartComponent(data StackedBarChartData, autoStart bool) { 
     {{ 
         hour, min, sec := data.CurrentTime.Clock()
         currentTime := fmt.Sprintf("%02d:%02d:%02d", hour, min, sec)
     }}
     <div id={ data.ID } class="stacked-bar-chart-container">
         <h3>{ data.Title }</h3>
-        @Clock(currentTime)
+        @Clock(currentTime, autoStart)
         @Legend(data.Machines)
         <div class="chart-svg">
             @StackedBarChartSVG(data)

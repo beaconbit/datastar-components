@@ -1,9 +1,20 @@
 package form
 
 import (
-	"fmt"
+	"context"
 	"strings"
+
+	"github.com/a-h/templ"
 )
+
+func renderComponentToString(c templ.Component) (string, error) {
+	var buf strings.Builder
+	ctx := context.Background()
+	if err := c.Render(ctx, &buf); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
 
 // FieldType represents the type of form field
 type FieldType string
@@ -100,87 +111,12 @@ func DefaultForm() FormData {
 
 // GenerateHTML generates the HTML for a form
 func (f FormData) GenerateHTML() string {
-	var sb strings.Builder
-
-	sb.WriteString(fmt.Sprintf(`<form id="%s" class="form" action="%s" method="%s">`, f.ID, f.Action, f.Method))
-	sb.WriteString(fmt.Sprintf(`<h3>%s</h3>`, f.Title))
-
-	for _, field := range f.Fields {
-		sb.WriteString(`<div class="form-field">`)
-		sb.WriteString(fmt.Sprintf(`<label for="%s">%s</label>`, field.ID, field.Label))
-
-		switch field.Type {
-		case FieldText, FieldEmail, FieldPassword, FieldNumber:
-			sb.WriteString(fmt.Sprintf(`<input type="%s" id="%s" name="%s" value="%s" placeholder="%s"`,
-				string(field.Type), field.ID, field.Name, field.Value, field.Placeholder))
-			if field.Required {
-				sb.WriteString(` required`)
-			}
-			if field.Disabled {
-				sb.WriteString(` disabled`)
-			}
-			sb.WriteString(`>`)
-
-		case FieldTextarea:
-			sb.WriteString(fmt.Sprintf(`<textarea id="%s" name="%s" placeholder="%s"`,
-				field.ID, field.Name, field.Placeholder))
-			if field.Required {
-				sb.WriteString(` required`)
-			}
-			if field.Disabled {
-				sb.WriteString(` disabled`)
-			}
-			sb.WriteString(`>`)
-			sb.WriteString(field.Value)
-			sb.WriteString(`</textarea>`)
-
-		case FieldSelect:
-			sb.WriteString(fmt.Sprintf(`<select id="%s" name="%s"`, field.ID, field.Name))
-			if field.Required {
-				sb.WriteString(` required`)
-			}
-			if field.Disabled {
-				sb.WriteString(` disabled`)
-			}
-			sb.WriteString(`>`)
-			for _, option := range field.Options {
-				sb.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, option.Value, option.Label))
-			}
-			sb.WriteString(`</select>`)
-
-		case FieldCheckbox:
-			sb.WriteString(fmt.Sprintf(`<input type="checkbox" id="%s" name="%s" value="%s"`,
-				field.ID, field.Name, field.Value))
-			if field.Required {
-				sb.WriteString(` required`)
-			}
-			if field.Disabled {
-				sb.WriteString(` disabled`)
-			}
-			if field.Value == "true" {
-				sb.WriteString(` checked`)
-			}
-			sb.WriteString(`>`)
-		}
-
-		if field.Error != "" {
-			sb.WriteString(fmt.Sprintf(`<div class="error">%s</div>`, field.Error))
-		}
-
-		sb.WriteString(`</div>`)
+	component := FormComponent(f)
+	html, err := renderComponentToString(component)
+	if err != nil {
+		return ""
 	}
-
-	sb.WriteString(`<div class="form-actions">`)
-	sb.WriteString(`<button type="submit" class="btn btn-primary">Submit</button>`)
-	sb.WriteString(`<button type="reset" class="btn btn-secondary">Reset</button>`)
-	sb.WriteString(`</div>`)
-
-	if f.Submitted {
-		sb.WriteString(`<div class="success">Form submitted successfully!</div>`)
-	}
-
-	sb.WriteString(`</form>`)
-	return sb.String()
+	return html
 }
 
 // WithFieldValue updates a field's value

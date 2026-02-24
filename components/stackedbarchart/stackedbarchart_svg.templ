@@ -167,7 +167,7 @@ templ StackedBarChartSVG(data StackedBarChartData) {
         }
 
         // Find max delay for scaling
-        maxDelay := data.MaxDelay
+        maxDelay := 0
         for _, minute := range data.Minutes {
             if minute.TotalDelay > maxDelay {
                 maxDelay = minute.TotalDelay

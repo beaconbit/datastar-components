@@ -1,9 +1,12 @@
 package piechart
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"strings"
+
+	"github.com/a-h/templ"
 )
 
 type Point struct {
@@ -27,6 +30,15 @@ type PieChartData struct {
 	RenderData []SectorRenderData // Precomputed for template
 	SVG        string             // Full SVG string
 	HTML       string             // Full chart HTML
+}
+
+func renderComponentToString(c templ.Component) (string, error) {
+	var buf strings.Builder
+	ctx := context.Background()
+	if err := c.Render(ctx, &buf); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 func GetSectorPath(index int, sector Sector, sectors []Sector) string {
@@ -116,40 +128,19 @@ func ComputeRenderData(data PieChartData) []SectorRenderData {
 }
 
 func GenerateSVGString(data PieChartData) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf(`<svg width="%d" height="%d" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">`, data.Width, data.Height))
-	sb.WriteString(`<circle cx="200" cy="200" r="150" fill="#f0f0f0" stroke="#ccc" stroke-width="1"/>`)
-
-	renderData := ComputeRenderData(data)
-	for _, rd := range renderData {
-		sb.WriteString(fmt.Sprintf(`<path d="%s" fill="%s" stroke="#fff" stroke-width="2"/>`, rd.Path, rd.Color))
-		sb.WriteString(fmt.Sprintf(`<text x="%s" y="%s" text-anchor="middle" font-size="12" fill="#333">%s (%s)</text>`,
-			rd.LabelX, rd.LabelY, rd.Label, rd.PercentageText))
+	component := PieChartSVG(data)
+	if html, err := renderComponentToString(component); err == nil {
+		return html
 	}
-
-	sb.WriteString(`<circle cx="200" cy="200" r="50" fill="white"/>`)
-	sb.WriteString(`<text x="200" y="200" text-anchor="middle" dy="5" font-size="14" font-weight="bold">Total</text>`)
-	sb.WriteString(`</svg>`)
-	return sb.String()
+	return ""
 }
 
 func GenerateChartHTML(data PieChartData) string {
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf(`<div id="%s" class="pie-chart-container">`, data.ID))
-	sb.WriteString(fmt.Sprintf(`<h3>%s</h3>`, data.Title))
-	sb.WriteString(`<div class="chart-svg">`)
-	sb.WriteString(GenerateSVGString(data))
-	sb.WriteString(`</div><div class="legend">`)
-
-	for _, sector := range data.Sectors {
-		sb.WriteString(`<div class="legend-item">`)
-		sb.WriteString(fmt.Sprintf(`<span class="legend-color" style="background-color: %s"></span>`, sector.Color))
-		sb.WriteString(fmt.Sprintf(`<span class="legend-label">%s</span>`, sector.Label))
-		sb.WriteString(fmt.Sprintf(`<span class="legend-value">%s</span>`, FormatPercentage(sector.Percentage)))
-		sb.WriteString(`</div>`)
+	component := PieChartContainer(data)
+	if html, err := renderComponentToString(component); err == nil {
+		return html
 	}
-	sb.WriteString(`</div></div>`)
-	return sb.String()
+	return ""
 }
 
 func FormatPercentage(p float64) string {

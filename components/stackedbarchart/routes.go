@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -15,6 +16,7 @@ import (
 // Component implements the stacked bar chart component
 type Component struct {
 	rand *rand.Rand
+	mu   sync.RWMutex
 	data StackedBarChartData
 }
 
@@ -77,6 +79,8 @@ func (c *Component) incrementHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add random delay to the specified machine
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.data.AddRandomDelay(machineID)
 
 	// Regenerate SVG and HTML
@@ -84,7 +88,7 @@ func (c *Component) incrementHandler(w http.ResponseWriter, r *http.Request) {
 	c.data.HTML = c.data.GenerateHTML()
 
 	// Create the stacked bar chart component with updated data
-	chartComponent := StackedBarChart(c.data)
+	chartComponent := StackedBarChart(c.data, false)
 
 	// Create SSE response
 	sse := datastar.NewSSE(w, r)
@@ -109,6 +113,8 @@ func (c *Component) advanceMinuteHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Advance chart by one minute
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.data.AdvanceMinute()
 
 	// Regenerate SVG and HTML
@@ -116,7 +122,7 @@ func (c *Component) advanceMinuteHandler(w http.ResponseWriter, r *http.Request)
 	c.data.HTML = c.data.GenerateHTML()
 
 	// Create the stacked bar chart component with updated data
-	chartComponent := StackedBarChart(c.data)
+	chartComponent := StackedBarChart(c.data, false)
 
 	// Create SSE response
 	sse := datastar.NewSSE(w, r)
@@ -132,55 +138,81 @@ func (c *Component) advanceMinuteHandler(w http.ResponseWriter, r *http.Request)
 	sse.PatchElements(buf.String())
 }
 
-// clockTickHandler handles requests to update the live clock
+// clockTickHandler handles requests to update the live clock via SSE long-polling
 func (c *Component) clockTickHandler(w http.ResponseWriter, r *http.Request) {
-	// Get current wall clock time
-	now := time.Now()
-	currentWallMinute := now.Minute()
-
-	// Check if wall clock minute has changed from chart's current minute
-	chartCurrentMinute := c.data.CurrentTime.Minute()
-	minuteChanged := currentWallMinute != chartCurrentMinute
-
-	if minuteChanged {
-		// Advance chart by one minute
-		c.data.AdvanceMinute()
-		// CurrentTime is already updated inside AdvanceMinute() to now
-
-		// Regenerate SVG and HTML
-		c.data.SVG = c.data.GenerateSVGString()
-		c.data.HTML = c.data.GenerateHTML()
-
-		// Always return SSE for minute changes (chart needs to update)
-		// This ensures the client receives the updated chart even if datastar=false
-		sse := datastar.NewSSE(w, r)
-		chartComponent := StackedBarChart(c.data)
-		var buf strings.Builder
-		if err := chartComponent.Render(r.Context(), &buf); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		sse.PatchElements(buf.String())
-		return
-	}
-
-	// Minute unchanged
-	// Update current time for clock display
-	c.data.CurrentTime = now
-
-	// Check if this is a Datastar SSE request (datastar=true)
-	if r.URL.Query().Get("datastar") == "true" {
-		// Create SSE response with clock update only
-		sse := datastar.NewSSE(w, r)
+	// If not a datastar request, return plain HTML clock (backward compatibility)
+	if r.URL.Query().Get("datastar") == "" {
 		clockHTML := c.data.GenerateClockHTML()
-		sse.PatchElements(clockHTML)
+		w.Header().Set("Content-Type", "text/html")
+		w.Write([]byte(clockHTML))
 		return
 	}
 
-	// Non-Datastar request, minute unchanged: return plain HTML clock
-	clockHTML := c.data.GenerateClockHTML()
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(clockHTML))
+	// Set up SSE connection
+	sse := datastar.NewSSE(w, r)
+
+	// Get initial time
+	now := time.Now()
+	lastSecond := now.Second()
+	lastMinute := now.Minute()
+
+	// Track chart's current minute (for detecting when to advance)
+	c.mu.RLock()
+	chartMinute := c.data.CurrentTime.Minute()
+	c.mu.RUnlock()
+
+	// Create a ticker that fires every 100ms
+	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-r.Context().Done():
+			// Client disconnected
+			return
+		case <-ticker.C:
+			now := time.Now()
+			currentSecond := now.Second()
+			currentMinute := now.Minute()
+
+			// Check if wall-clock minute has changed
+			if currentMinute != lastMinute {
+				lastMinute = currentMinute
+
+				// Check if chart's minute is behind wall-clock minute
+				c.mu.Lock()
+				chartMinute = c.data.CurrentTime.Minute()
+				if chartMinute != currentMinute {
+					// BRANCH: Advance chart data and send entire modified page with new bar locations
+					c.data.AdvanceMinute()
+					c.data.SVG = c.data.GenerateSVGString()
+					c.data.HTML = c.data.GenerateHTML()
+					chartComponent := StackedBarChart(c.data, false)
+					var buf strings.Builder
+					if err := chartComponent.Render(r.Context(), &buf); err != nil {
+						c.mu.Unlock()
+						// If rendering fails, abort the connection
+						return
+					}
+					html := buf.String()
+					c.mu.Unlock()
+					sse.PatchElements(html)
+					// After advancing the chart, we've already sent a fresh clock;
+					// no need to send a separate clock tick update this iteration.
+					continue
+				}
+				c.mu.Unlock()
+			}
+
+			// Check if wall-clock second has changed
+			if currentSecond != lastSecond {
+				lastSecond = currentSecond
+				// BRANCH: Simple clock tick update – send only the new clock HTML
+				clockHTML := c.data.GenerateClockHTML()
+				sse.PatchElements(clockHTML)
+			}
+		}
+	}
 }
 
 // randomizeHandler handles requests to randomize all data
@@ -192,10 +224,12 @@ func (c *Component) randomizeHandler(w http.ResponseWriter, r *http.Request) {
 		datastar.ReadSignals(r, &signals) // Ignore error for GET requests
 
 		// Generate new random data
+		c.mu.Lock()
+		defer c.mu.Unlock()
 		c.data = c.GenerateInitialData()
 
 		// Create the stacked bar chart component
-		chartComponent := StackedBarChart(c.data)
+		chartComponent := StackedBarChart(c.data, false)
 
 		// Create SSE response
 		sse := datastar.NewSSE(w, r)
@@ -214,8 +248,10 @@ func (c *Component) randomizeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fallback: return just the chart HTML for non-Datastar requests
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.data = c.GenerateInitialData()
-	chartComponent := StackedBarChart(c.data)
+	chartComponent := StackedBarChart(c.data, false)
 
 	w.Header().Set("Content-Type", "text/html")
 	chartComponent.Render(r.Context(), w)
@@ -226,6 +262,8 @@ func (c *Component) signalsHandler(w http.ResponseWriter, r *http.Request) {
 	// Example endpoint to patch signals
 	sse := datastar.NewSSE(w, r)
 
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	// Send current stats
 	signals := map[string]interface{}{
 		"lastUpdated":  time.Now().Format(time.RFC3339),
